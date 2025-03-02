@@ -3,11 +3,14 @@ import { Router } from "express";
 import {
   obtenerDirectores,
   obtenerDirectoresPorId,
+  crearDirector,
 } from "../controllers/directores.controllers.js";
 
 const router = Router();
 
 router.get("/directores", obtenerDirectores);
-router.get("/directores/:id", obtenerDirectores);
 
+router.get("/directores/:id", obtenerDirectoresPorId);
+
+router.post("/directores", crearDirector);
 export default router;
