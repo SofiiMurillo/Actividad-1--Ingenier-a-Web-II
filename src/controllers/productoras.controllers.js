@@ -41,3 +41,19 @@ export const crearProductora = async (req, res) => {
     return res.status(500).json({ message: "Error en el servidor interno" });
   }
 };
+
+export const eliminarProductora = async (req, res) => {
+  const { id } = req.params;
+
+  const { rowCount } = await pool.query(
+    "DELETE FROM productoras WHERE id = $1 RETURNING *",
+    [id]
+  );
+
+  if (rowCount === 0) {
+    return res.status(404).json({ Message: "Productora no existente" });
+  }
+  return res
+    .status(200)
+    .json({ Message: "Productora eliminada corretcamente" });
+};
