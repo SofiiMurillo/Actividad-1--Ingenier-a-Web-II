@@ -18,3 +18,25 @@ export const obtenerDatosPorId = async (req, res) => {
   }
   res.json(rows);
 };
+
+export const crearDato = async (req, res) => {
+  try {
+    const data = req.body;
+    console.log(data);
+    const { rows } = await pool.query(
+      "INSERT INTO tipos_multimedia (nombre, descripcion, fecha_creacion, fecha_actualizacion) VALUES ($1, $2, $3, $4) RETURNING *",
+      [
+        data.nombre,
+        data.descripcion,
+        data.fecha_creacion,
+        data.fecha_actualizacion,
+      ]
+    );
+    return res.json(rows[0]);
+  } catch (error) {
+    if (error?.code === "23505") {
+      return res.status(409).json({ message: "El dato ya existe" });
+    }
+    return res.status(500).json({ message: "Error en el servidor interno" });
+  }
+};
