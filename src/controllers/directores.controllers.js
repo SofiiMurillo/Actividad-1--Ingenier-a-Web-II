@@ -47,3 +47,21 @@ export const eliminarDirector = async (req, res) => {
 
   return res.status(200).json({ Message: "Director eliminado correctamente" });
 };
+
+export const actualizarDirector = async (req, res) => {
+  const { id } = req.params;
+  const data = req.body;
+
+  const { rows } = await pool.query(
+    "UPDATE directores SET nombres = $1, estado = $2, fecha_creacion = $3, fecha_actualizacion = $4 WHERE id = $5 RETURNING *",
+    [
+      data.nombres,
+      data.estado,
+      data.fecha_creacion,
+      data.fecha_actualizacion,
+      id,
+    ]
+  );
+
+  return res.json(rows[0]);
+};
