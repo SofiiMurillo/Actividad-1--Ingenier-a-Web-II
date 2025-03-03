@@ -15,3 +15,34 @@ export const obtenermediaPorId = async (req, res) => {
   }
   res.json(rows);
 };
+
+export const crearMedia = async (req, res) => {
+  try {
+    const data = req.body;
+    console.log(data);
+    const { rows } = await pool.query(
+      "INSERT INTO media (serial, titulo, sinopsis, url_pelicula, imagen_portada, ano_estreno, fecha_creacion, fecha_actualizacion, genero_id, director_id, productora_id, tipo_id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12) RETURNING *",
+      [
+        data.serial,
+        data.titulo,
+        data.sinopsis,
+        data.url_pelicula,
+        data.imagen_portada,
+        data.ano_estreno,
+        data.fecha_creacion,
+        data.fecha_actualizacion,
+        data.genero_id,
+        data.director_id,
+        data.productora_id,
+        data.tipo_id,
+      ]
+    );
+    return res.json(rows[0]);
+  } catch (error) {
+    console.log("///error", error);
+    if (error?.code === "23505") {
+      return res.status(409).json({ Message: "El dato ya existe" });
+    }
+    return res.status(500).json({ message: "Error en el servidor interno" });
+  }
+};
