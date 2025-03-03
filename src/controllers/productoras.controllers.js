@@ -17,3 +17,27 @@ export const obtenerProductorasPorId = async (req, res) => {
   }
   res.json(rows);
 };
+
+export const crearProductora = async (req, res) => {
+  try {
+    const data = req.body;
+    console.log(data);
+    const { rows } = await pool.query(
+      "INSERT INTO productoras (nombre, estado, slogan, descripcion, fecha_creacion, fecha_actualizacion) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *",
+      [
+        data.nombre,
+        data.estado,
+        data.slogan,
+        data.descripcion,
+        data.fecha_creacion,
+        data.fecha_actualizacion,
+      ]
+    );
+    return res.json(rows[0]);
+  } catch (error) {
+    if (error?.code === "23505") {
+      return res.status(409).json({ message: "El productor ya existe" });
+    }
+    return res.status(500).json({ message: "Error en el servidor interno" });
+  }
+};
