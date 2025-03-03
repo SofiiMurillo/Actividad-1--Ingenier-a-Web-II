@@ -40,3 +40,18 @@ export const crearDato = async (req, res) => {
     return res.status(500).json({ message: "Error en el servidor interno" });
   }
 };
+
+export const eliminarDato = async (req, res) => {
+  const { id } = req.params;
+
+  const { rowCount } = await pool.query(
+    "DELETE FROM tipos_multimedia WHERE id = $1 RETURNING *",
+    [id]
+  );
+
+  if (rowCount === 0) {
+    return res.status(404).json({ Message: "Tipo no existente" });
+  }
+
+  return res.status(200).json({ Message: "Tipo eliminado correctamente" });
+};
