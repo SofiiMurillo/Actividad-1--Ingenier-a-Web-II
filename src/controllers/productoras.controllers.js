@@ -57,3 +57,23 @@ export const eliminarProductora = async (req, res) => {
     .status(200)
     .json({ Message: "Productora eliminada corretcamente" });
 };
+
+export const actualizarProductora = async (req, res) => {
+  const { id } = req.params;
+  const data = req.body;
+
+  const { rows } = await pool.query(
+    "UPDATE productoras SET nombre = $1, estado= $2, slogan = $3, descripcion = $4, fecha_creacion = $5, fecha_actualizacion = $6 WHERE id = $7 RETURNING *",
+    [
+      data.nombre,
+      data.estado,
+      data.slogan,
+      data.descripcion,
+      data.fecha_creacion,
+      data.fecha_actualizacion,
+      id,
+    ]
+  );
+
+  return res.json(rows[0]);
+};
