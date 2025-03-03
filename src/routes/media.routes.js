@@ -1,9 +1,13 @@
 import { Router } from "express";
 
-import { obtenerMedia } from "../controllers/media.controllers.js";
+import {
+  obtenerMedia,
+  obtenermediaPorId,
+} from "../controllers/media.controllers.js";
 
 const router = Router();
 
 router.get("/media", obtenerMedia);
+router.get("/media/:id", obtenermediaPorId);
 
 export default router;
