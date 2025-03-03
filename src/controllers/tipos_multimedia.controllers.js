@@ -55,3 +55,21 @@ export const eliminarDato = async (req, res) => {
 
   return res.status(200).json({ Message: "Tipo eliminado correctamente" });
 };
+
+export const actualizarDatos = async (req, res) => {
+  const { id } = req.params;
+  const data = req.body;
+
+  const { rows } = await pool.query(
+    "UPDATE tipos_multimedia SET nombre = $1, descripcion = $2, fecha_creacion = $3, fecha_actualizacion = $4 WHERE id = $5 RETURNING *",
+    [
+      data.nombre,
+      data.descripcion,
+      data.fecha_creacion,
+      data.fecha_actualizacion,
+      id,
+    ]
+  );
+
+  return res.json(rows[0]);
+};
