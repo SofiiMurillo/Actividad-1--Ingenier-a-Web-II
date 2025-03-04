@@ -55,6 +55,30 @@ export const crearMedia = async (req, res) => {
       }
     }
 
+    // Validar que el director existe y está activo
+    const directorQuery = await pool.query(
+      "SELECT id FROM directores WHERE id = $1 AND estado = 'Activo'",
+      [data.director_id]
+    );
+
+    if (directorQuery.rows.length === 0) {
+      return res
+        .status(400)
+        .json({ message: "El director no existe o no está activo" });
+    }
+
+    const generoQuery = await pool.query(
+      "SELECT id FROM generos WHERE id = $1 AND estado = 'Activo'"[
+        data.genero_id
+      ]
+    );
+
+    if (generoQuery.rows.length === 0) {
+      return res
+        .status(400)
+        .json({ message: "El genero no existe o no está activo" });
+    }
+
     // Insertar en la base de datos
     const { rows } = await pool.query(
       "INSERT INTO media (serial, titulo, sinopsis, url_pelicula, imagen_portada, ano_estreno, fecha_creacion, fecha_actualizacion, genero_id, director_id, productora_id, tipo_id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12) RETURNING *",
