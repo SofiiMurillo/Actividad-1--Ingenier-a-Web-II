@@ -55,7 +55,6 @@ export const crearMedia = async (req, res) => {
       }
     }
 
-    // Validar que el director existe y está activo
     const directorQuery = await pool.query(
       "SELECT id FROM directores WHERE id = $1 AND estado = 'Activo'",
       [data.director_id]
@@ -68,9 +67,8 @@ export const crearMedia = async (req, res) => {
     }
 
     const generoQuery = await pool.query(
-      "SELECT id FROM generos WHERE id = $1 AND estado = 'Activo'"[
-        data.genero_id
-      ]
+      "SELECT id FROM generos WHERE id = $1 AND estado = 'Activo'",
+      [data.genero_id]
     );
 
     if (generoQuery.rows.length === 0) {
@@ -103,7 +101,7 @@ export const crearMedia = async (req, res) => {
     console.error("/////////////Error en crearMedia:", error);
 
     if (error.code === "23505") {
-      return res.status(409).json({ message: "El dato ya existe" });
+      return res.status(409).json({ message: "El serial ingresado ya existe" });
     }
 
     if (error.code === "23503") {
@@ -125,7 +123,7 @@ export const eliminarMedia = async (req, res) => {
   );
 
   if (rowCount === 0) {
-    return res.status(404).json({ Message: "Dato no existente" });
+    return res.status(404).json({ Message: "El serial ingresado ya existe" });
   }
 
   return res.status(200).json({ Message: "Dato eliminado correctamente" });
