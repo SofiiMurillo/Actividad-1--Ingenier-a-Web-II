@@ -20,6 +20,42 @@ export const crearMedia = async (req, res) => {
   try {
     const data = req.body;
     console.log(data);
+
+    // Verificar que los campos obligatorios estén presentes
+    const requiredFields = [
+      "serial",
+      "titulo",
+      "sinopsis",
+      "url_pelicula",
+      "imagen_portada",
+      "ano_estreno",
+      "fecha_creacion",
+      "fecha_actualizacion",
+      "genero_id",
+      "director_id",
+      "productora_id",
+      "tipo_id",
+    ];
+
+    for (const field of requiredFields) {
+      if (!data[field]) {
+        return res
+          .status(400)
+          .json({ message: `El campo ${field} es requerido` });
+      }
+    }
+
+    // Validar que los IDs son números enteros válidos
+    const idFields = ["genero_id", "director_id", "productora_id", "tipo_id"];
+    for (const field of idFields) {
+      if (!Number.isInteger(Number(data[field]))) {
+        return res.status(400).json({
+          message: `El campo ${field} debe ser un número entero válido`,
+        });
+      }
+    }
+
+    // Insertar en la base de datos
     const { rows } = await pool.query(
       "INSERT INTO media (serial, titulo, sinopsis, url_pelicula, imagen_portada, ano_estreno, fecha_creacion, fecha_actualizacion, genero_id, director_id, productora_id, tipo_id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12) RETURNING *",
       [
@@ -37,12 +73,21 @@ export const crearMedia = async (req, res) => {
         data.tipo_id,
       ]
     );
-    return res.json(rows[0]);
+
+    return res.status(201).json(rows[0]);
   } catch (error) {
-    console.log("///error", error);
-    if (error?.code === "23505") {
-      return res.status(409).json({ Message: "El dato ya existe" });
+    console.error("/////////////Error en crearMedia:", error);
+
+    if (error.code === "23505") {
+      return res.status(409).json({ message: "El dato ya existe" });
     }
+
+    if (error.code === "23503") {
+      return res.status(400).json({
+        message: "Uno de los IDs proporcionados no existe en la base de datos",
+      });
+    }
+
     return res.status(500).json({ message: "Error en el servidor interno" });
   }
 };
