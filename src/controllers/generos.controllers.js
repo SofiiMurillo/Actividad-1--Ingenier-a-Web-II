@@ -21,7 +21,7 @@ export const obtenerGenerosPorId = async (req, res) => {
 export const crearGenero = async (req, res) => {
   try {
     const data = req.body;
-    console.log(data);
+
     const { rows } = await pool.query(
       "INSERT INTO generos (nombre, estado, descripcion, fecha_creacion, fecha_actualizacion) VALUES ($1, $2, $3, $4, $5) RETURNING *",
       [

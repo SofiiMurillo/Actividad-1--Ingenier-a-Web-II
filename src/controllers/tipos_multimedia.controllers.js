@@ -22,7 +22,7 @@ export const obtenerDatosPorId = async (req, res) => {
 export const crearDato = async (req, res) => {
   try {
     const data = req.body;
-    console.log(data);
+
     const { rows } = await pool.query(
       "INSERT INTO tipos_multimedia (nombre, descripcion, fecha_creacion, fecha_actualizacion) VALUES ($1, $2, $3, $4) RETURNING *",
       [

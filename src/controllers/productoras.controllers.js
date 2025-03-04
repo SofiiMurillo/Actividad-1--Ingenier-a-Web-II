@@ -21,7 +21,7 @@ export const obtenerProductorasPorId = async (req, res) => {
 export const crearProductora = async (req, res) => {
   try {
     const data = req.body;
-    console.log(data);
+
     const { rows } = await pool.query(
       "INSERT INTO productoras (nombre, estado, slogan, descripcion, fecha_creacion, fecha_actualizacion) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *",
       [
