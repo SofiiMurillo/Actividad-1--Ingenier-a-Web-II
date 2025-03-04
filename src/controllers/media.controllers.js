@@ -74,7 +74,18 @@ export const crearMedia = async (req, res) => {
     if (generoQuery.rows.length === 0) {
       return res
         .status(400)
-        .json({ message: "El genero no existe o no está activo" });
+        .json({ Message: "El genero no existe o no está activo" });
+    }
+
+    const productoraQuery = await pool.query(
+      "SELECT id FROM productoras WHERE id = $1 AND estado = 'Activo'",
+      [data.productora_id]
+    );
+
+    if (productoraQuery.rows.length === 0) {
+      return res
+        .status(400)
+        .json({ Message: "La productora no existe o esta inactiva" });
     }
 
     // Insertar en la base de datos
@@ -127,4 +138,30 @@ export const eliminarMedia = async (req, res) => {
   }
 
   return res.status(200).json({ Message: "Dato eliminado correctamente" });
+};
+
+export const actualizarMedia = async (req, res) => {
+  const { id } = req.params;
+  const data = req.body;
+
+  const { rows } = await pool.query(
+    "UPDATE media SET serial = $1, titulo = $2, sinopsis = $3, url_pelicula = $4, imagen_portada = $5, ano_estreno = $6, fecha_creacion = $7, fecha_actualizacion = $8, genero_id = $9, director_id = $10, productora_id = $11, tipo_id = $12 WHERE id = $13 RETURNING *",
+    [
+      data.serial,
+      data.titulo,
+      data.sinopsis,
+      data.url_pelicula,
+      data.imagen_portada,
+      data.ano_estreno,
+      data.fecha_creacion,
+      data.fecha_actualizacion,
+      data.genero_id,
+      data.director_id,
+      data.productora_id,
+      data.tipo_id,
+      id,
+    ]
+  );
+
+  return res.json(rows[0]);
 };
