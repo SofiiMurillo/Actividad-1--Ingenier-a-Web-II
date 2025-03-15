@@ -34,6 +34,7 @@ export const crearGenero = async (req, res) => {
     );
     return res.json(rows[0]);
   } catch (error) {
+    console.log("***********ERROR:", error);
     if (error?.code === "23505") {
       return res.status(409).json({ message: "El nombre ya existe" });
     }

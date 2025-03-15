@@ -19,7 +19,7 @@ export const obtenermediaPorId = async (req, res) => {
 export const crearMedia = async (req, res) => {
   try {
     const data = req.body;
-
+    console.log("data.genero_id", data.genero_id);
     const requiredFields = [
       "serial",
       "titulo",
@@ -61,17 +61,22 @@ export const crearMedia = async (req, res) => {
         .status(400)
         .json({ message: "El director no existe o no está activo" });
     }
-
+    console.log("********entrando");
     const generoQuery = await pool.query(
       "SELECT id FROM generos WHERE id = $1 AND estado = 'Activo'",
       [data.genero_id]
     );
+    //console.log("********generoQuery", generoQuery);
+    console.log("********generoQuery", generoQuery.rows.length);
 
     if (generoQuery.rows.length === 0) {
+      console.log("********generoQuery", generoQuery.rows.length);
+
       return res
         .status(400)
         .json({ Message: "El genero no existe o no está activo" });
     }
+    console.log("********saliendo");
 
     const productoraQuery = await pool.query(
       "SELECT id FROM productoras WHERE id = $1 AND estado = 'Activo'",
@@ -104,6 +109,7 @@ export const crearMedia = async (req, res) => {
 
     return res.status(201).json(rows[0]);
   } catch (error) {
+    console.log("********ERROR", error);
     if (error.code === "23505") {
       return res.status(409).json({ message: "El serial ingresado ya existe" });
     }

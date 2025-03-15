@@ -22,7 +22,6 @@ export const obtenerDatosPorId = async (req, res) => {
 export const crearDato = async (req, res) => {
   try {
     const data = req.body;
-
     const { rows } = await pool.query(
       "INSERT INTO tipos_multimedia (nombre, descripcion, fecha_creacion, fecha_actualizacion) VALUES ($1, $2, $3, $4) RETURNING *",
       [
@@ -34,6 +33,7 @@ export const crearDato = async (req, res) => {
     );
     return res.json(rows[0]);
   } catch (error) {
+    console.log("***********ERROR:", error);
     if (error?.code === "23505") {
       return res.status(409).json({ message: "El dato ya existe" });
     }
