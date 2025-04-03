@@ -43,20 +43,38 @@ export const crearProductora = async (req, res) => {
 };
 
 export const eliminarProductora = async (req, res) => {
-  const { id } = req.params;
+  try {
+    const { id } = req.params;
 
-  const { rowCount } = await pool.query(
-    "DELETE FROM productoras WHERE id = $1 RETURNING *",
-    [id]
-  );
+    const { rowCount } = await pool.query(
+      "DELETE FROM productoras WHERE id = $1 RETURNING *",
+      [id]
+    );
 
-  if (rowCount === 0) {
-    return res.status(404).json({ Message: "Productora no existente" });
+    if (rowCount === 0) {
+      return res.status(404).json({ Message: "Productora no existente" });
+    }
+    
+    return res
+      .status(200)
+      .json({
+        Message: "Productora eliminada correctamente",
+      });
+  } catch (err) {
+    if (err.code === "23503") {
+      return res.status(400).json({
+        message:
+          "No esta permitido eliminar este productora puesto que se esta utilizando en una producción."
+      });
+    }
+    
+    console.error("Error al eliminar el genero.", err);
+    return res.status(500).json({
+      message: "Error interno del servidor",
+    });
   }
-  return res
-    .status(200)
-    .json({ Message: "Productora eliminada corretcamente" });
-};
+}
+
 
 export const actualizarProductora = async (req, res) => {
   const { id } = req.params;
@@ -73,7 +91,7 @@ export const actualizarProductora = async (req, res) => {
       data.fecha_actualizacion,
       id,
     ]
-  );
+  )
 
   return res.json(rows[0]);
 };
