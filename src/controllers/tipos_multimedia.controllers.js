@@ -42,6 +42,7 @@ export const crearDato = async (req, res) => {
 };
 
 export const eliminarDato = async (req, res) => {
+  try {
   const { id } = req.params;
 
   const { rowCount } = await pool.query(
@@ -54,7 +55,19 @@ export const eliminarDato = async (req, res) => {
   }
 
   return res.status(200).json({ Message: "Tipo eliminado correctamente" });
-};
+  } catch (err) {
+    if (err.code === "23503") {
+      return res.status(400).json({
+        message:
+          "No esta permitido eliminar este tipo puesto que se esta utilizando en una produccion.",
+      });
+    }
+    console.error("Error al eliminar el tipo:", err);
+    return res.status(500).json({
+      message: "Error interno del servidor",
+    });
+  }
+}
 
 export const actualizarDatos = async (req, res) => {
   const { id } = req.params;
