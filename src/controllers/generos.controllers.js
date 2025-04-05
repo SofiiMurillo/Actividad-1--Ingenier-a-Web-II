@@ -43,19 +43,34 @@ export const crearGenero = async (req, res) => {
 };
 
 export const eliminarGenero = async (req, res) => {
-  const { id } = req.params;
+  try {
+    const { id } = req.params;
 
-  const { rowCount } = await pool.query(
-    "DELETE FROM generos WHERE id = $1 RETURNING *",
-    [id]
-  );
+    const { rowCount } = await pool.query(
+      "DELETE FROM generos WHERE id = $1 RETURNING *",
+      [id]
+    );
 
-  if (rowCount === 0) {
-    return res.status(404).json({ Message: "Genero no existente" });
+    if (rowCount === 0) {
+      return res.status(404).json({ Message: "Genero no existente" });
+    }
+
+    return res.status(200).json({ Message: "Genero eliminado correctamente" });
+  } catch (err) {
+    if (err.code === "23503") {
+      return res.status(400).json({
+        message:
+          "No esta permitido eliminar este genero puesto que se esta utilizando en una produccion.",
+      });
+    }
+
+    console.error("Error al eliminar genero:", err);
+    return res.status(500).json({
+      message: "Error interno del servidor",
+    });
   }
-
-  return res.status(200).json({ Message: "Genero eliminado correctamente" });
 };
+
 
 export const actualizarGenero = async (req, res) => {
   const { id } = req.params;

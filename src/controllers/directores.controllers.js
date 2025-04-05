@@ -34,19 +34,34 @@ export const crearDirector = async (req, res) => {
 };
 
 export const eliminarDirector = async (req, res) => {
-  const { id } = req.params;
+  try {
+    const { id } = req.params;
 
-  const { rowCount } = await pool.query(
-    "DELETE FROM directores WHERE id = $1 RETURNING *",
-    [id]
-  );
+    const { rowCount } = await pool.query(
+      "DELETE FROM directores WHERE id = $1 RETURNING *",
+      [id]
+    );
 
-  if (rowCount === 0) {
-    return res.status(404).json({ Message: "Director no existente" });
+    if (rowCount === 0) {
+      return res.status(404).json({ message: "Director no existente" });
+    }
+
+    return res
+      .status(200)
+      .json({ message: "Director eliminado correctamente" });
+  } catch (err) {
+    if (err.code === "23503") {
+      return res.status(400).json({
+        message:
+          "No puedes eliminar este director porque está siendo utilizado en una producción.",
+      });
+    }
+
+    console.error("Error al eliminar director:", err);
+    return res.status(500).json({ message: "Error interno del servidor" });
   }
-
-  return res.status(200).json({ Message: "Director eliminado correctamente" });
 };
+
 
 export const actualizarDirector = async (req, res) => {
   const { id } = req.params;
